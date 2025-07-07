@@ -96,11 +96,24 @@ Public Class FrmVentas
     End Sub
 
     Private Sub btnAgregar_Click(sender As Object, e As EventArgs) Handles btnAgregar.Click
-        ' Validar campos vacíos
-        If txtCodigo.Text = "" Or txtNombre.Text = "" Or txtPrecio.Text = "" Then
-            MessageBox.Show("Por favor completa todos los campos.")
+
+
+        If txtCodigo.Text = "" Then
+            MsgBox("Por favor, ingresa el código del producto.", MsgBoxStyle.Exclamation, "Código vacío")
             Exit Sub
         End If
+        ' Simulación: si el nombre está vacío, asumimos que el producto no se encontró
+        If txtNombre.Text = "" Then
+            MsgBox("El producto no fue encontrado en la base de datos.", MsgBoxStyle.Critical, "Producto no encontrado")
+            Exit Sub
+        End If
+        If nudCantidad.Value <= 0 Then
+            MsgBox("La cantidad debe ser mayor a cero.", MsgBoxStyle.Information, "Cantidad inválida")
+            Exit Sub
+        End If
+
+
+
 
         ' Obtener datos y calcular subtotal
         Dim cantidad As Integer = CInt(nudCantidad.Value)
@@ -147,13 +160,18 @@ Public Class FrmVentas
     End Sub
 
     Private Sub btnCobrar_Click(sender As Object, e As EventArgs) Handles btnCobrar.Click
-        If dgvProductos.Rows.Count = 0 Then
-            MessageBox.Show("No hay productos para cobrar.")
-        Else
-            MessageBox.Show("Venta registrada correctamente. Total: $" & txtTotal.Text)
-            dgvProductos.Rows.Clear()
-            txtTotal.Clear()
+        ' Verifica que haya productos reales en el carrito
+        If dgvProductos.Rows.Cast(Of DataGridViewRow)().All(Function(r) r.IsNewRow) Then
+            MsgBox("No hay productos en el carrito para cobrar.", MsgBoxStyle.Exclamation, "Carrito vacío")
+            Exit Sub
         End If
+
+        ' Si hay productos, continúa el proceso
+        MsgBox("Venta registrada con éxito. Total: $" & txtTotal.Text, MsgBoxStyle.Information, "Venta exitosa")
+
+        ' (Opcional) Limpiar carrito
+        dgvProductos.Rows.Clear()
+        txtTotal.Clear()
     End Sub
 End Class
 
